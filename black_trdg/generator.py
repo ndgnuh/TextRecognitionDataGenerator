@@ -57,6 +57,7 @@ def generate(
 
     # Composite fg and bg
     output = Image.alpha_composite(background.convert("RGBA"), text_mask)
+    output = output.convert("RGB")  # To write JPG
 
     return output
 
