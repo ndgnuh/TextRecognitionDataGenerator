@@ -14,9 +14,8 @@ class Sampler(ABC):
     def __len__(self):
         ...
 
-    @abstractclassmethod
     def __iter__(self):
-        ...
+        return iter((self[i] for i in range(len(self))))
 
     @abstractclassmethod
     def __getitem__(self):
@@ -29,6 +28,3 @@ class RandomSampler(Sampler):
 
     def __len__(self):
         return self.count
-
-    def __iter__(self):
-        return iter((self[i] for i in range(len(self))))
