@@ -6,6 +6,10 @@ import numpy as np
 import random
 
 
+def rotate(image, degree):
+    return image.rotate(degree, expand=True, resample=Resampling.BILINEAR)
+
+
 @dataclass
 class RandomRotate:
     min_degree: int = -3
@@ -15,7 +19,7 @@ class RandomRotate:
         degree = random.randint(self.min_degree, self.max_degree)
         # NEAREST IS NOT ENOUGH
         # TEXT IMAGE WILL BE BROKEN BY THE ROTATION
-        return image.rotate(degree, expand=True, resample=Resampling.BILINEAR)
+        return rotate(image, degree)
 
 
 class GaussianNoise:

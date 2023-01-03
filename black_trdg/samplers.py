@@ -114,3 +114,20 @@ class FontDirectory(Sampler):
 
     def __getitem__(self, i):
         return self.fonts[i]
+
+
+class BackgroundDirectory(Sampler):
+    def __init__(self, bgdir, max_size=None):
+        self.backgrounds = [
+            Image.open(path.join(bgdir, file))
+            for file in listdir(bgdir)
+        ]
+        if max_size is not None:
+            for bg in self.backgrounds:
+                bg.thumbnail(max_size)
+
+    def __len__(self):
+        return len(self.backgrounds)
+
+    def __getitem__(self, i):
+        return self.backgrounds[i]
