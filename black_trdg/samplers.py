@@ -4,6 +4,7 @@ from PIL import Image, ImageFont
 from dataclasses import dataclass
 from typing import Tuple
 from os import path, listdir
+from itertools import cycle
 
 
 from .samplers_base import RandomSampler, Sampler
@@ -55,6 +56,33 @@ class DefaultFontSampler(RandomSampler):
 
     def __getitem__(self, _):
         return self.font
+
+
+class CombineSampler(Sampler):
+    def __init__(self, samplers):
+        self.samplers = samplers
+        self.lens = list(map(len, self.samplers))
+        self.n_samplers = len(samplers)
+
+    def __len__(self):
+        return sum(self.lens)
+
+    def __getitem__(self, idx):
+        sampler_idx = idx % self.n_samplers
+        sample_idx = (idx // self.n_samplers) % self.lens[sampler_idx]
+        return self.samplers[sampler_idx][sample_idx]
+
+
+class TextFile(Sampler):
+    def __init__(self, file, encoding="utf-8", delim="\n"):
+        with open(file, encoding=encoding) as io:
+            self.lines = [line.strip() for line in io.read().split(delim)]
+
+    def __len__(self):
+        return len(self.lines)
+
+    def __getitem__(self, i):
+        return self.lines[i]
 
 
 class FontFile(Sampler):
