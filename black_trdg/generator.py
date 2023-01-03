@@ -1,5 +1,5 @@
 from PIL import ImageFont, Image, ImageDraw
-from typing import Tuple
+from typing import Tuple, Optional, Callable
 from random import randint
 from os import path, listdir
 import random
@@ -13,6 +13,8 @@ def generate(
     font: ImageFont,
     text_color: Tuple[int, int, int],
     stroke_width: int = 0,
+    transform: Optional[Callable] = None,
+    background_transform: Optional[Callable] = None,
 ):
     """
     - Load the font, use a big font size so that the image is not broken
@@ -38,12 +40,22 @@ def generate(
                     crop_y1 + crop_height)
         background = background.crop(crop_box)
 
-    # Put text on background
-    draw = ImageDraw.Draw(background)
+    # Create the empty text box
+    text_mask = Image.new("RGBA", (crop_width, crop_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(text_mask)
     draw.font = font
     draw.text((0, 0), text, font=font, fill=text_color)
 
-    return background
+    # Apply transformation(s) if any
+    if transform is not None:
+        text_mask = transform(text_mask)
+    if background_transform is not None:
+        background = background_transform(background)
+
+    # Composite fg and bg
+    output = Image.alpha_composite(background.convert("RGBA"), text_mask)
+
+    return output
 
 
 def prepare_assets(asset: str, load_function):
@@ -53,10 +65,11 @@ def prepare_assets(asset: str, load_function):
     if path.isfile(asset):
         return [load_function(asset)]
     elif path.isdir(asset):
-        return [
+        assets = [
             load_function(path.join(asset, file))
             for file in listdir(asset)
         ]
+        return assets
     else:
         raise ValueError("invalid asset")
 
@@ -66,18 +79,20 @@ def load_textfile(textfile):
         return [line.strip() for line in f.readlines()]
 
 
-class Generator:
+class Generator(tuple):
     def __init__(self,
                  texts,
                  backgrounds,
                  fonts,
                  text_colors=[(0, 0, 0)],
+                 count=None,
                  seed=None):
         self.texts = prepare_assets(texts, load_textfile)
+        self.count = len(self.texts) if count is None else count
         self.backgrounds = prepare_assets(backgrounds, Image.open)
         self.fonts = prepare_assets(
             fonts,
-            lambda f: ImageFont.truetype(f, size=32)
+            lambda f: ImageFont.truetype(f, size=48)
         )
         self.text_colors = prepare_assets(text_colors, None)
 
@@ -92,10 +107,10 @@ class Generator:
             random.seed(seed)
 
     def __len__(self):
-        return 1000
+        return self.count
 
     def __iter__(self):
-        return iter((self[0],))
+        return iter(self[i] for i in range(self.count))
 
     def __getitem__(self, _):
         background, text_color = random.choice(self.bg_fg_pairings)

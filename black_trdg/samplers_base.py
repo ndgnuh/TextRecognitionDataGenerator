@@ -1,4 +1,5 @@
 from abc import ABC, abstractclassmethod
+from dataclasses import dataclass
 
 
 class Sampler(ABC):
@@ -22,9 +23,12 @@ class Sampler(ABC):
         ...
 
 
+@dataclass
 class RandomSampler(Sampler):
+    count: int = 25
+
     def __len__(self):
-        return 100
+        return self.count
 
     def __iter__(self):
         return iter((self[i] for i in range(len(self))))
