@@ -22,7 +22,6 @@ def get_contrast(c1, c2):
 
 def get_dominance_colors(image, num_colors):
     image = image.copy()
-    image.thumbnail((56, 56))
     q_image = image.quantize(num_colors).convert("RGB")
     return set([color for _, color in q_image.getcolors()])
 
@@ -41,7 +40,7 @@ def safe_tqdm(iterable, *a, **k):
 def get_bg_fg_pairings(backgrounds: List[Image.Image],
                        colors: List[Tuple[int, int, int]],
                        num_colors: int = 3,
-                       contrast_threshold: float = 3):
+                       contrast_threshold: float = 2.75):
     pairings = []
     for background in safe_tqdm(backgrounds, "Pairing bg and fg colors"):
         palettes = get_dominance_colors(background, num_colors)
