@@ -4,6 +4,8 @@ from random import randint
 from os import path, listdir
 import random
 
+from .colors import get_bg_fg_pairings
+
 
 def generate(
     background: Image,
@@ -78,19 +80,29 @@ class Generator:
             lambda f: ImageFont.truetype(f, size=32)
         )
         self.text_colors = prepare_assets(text_colors, None)
+
+        self.bg_fg_pairings = get_bg_fg_pairings(
+            self.backgrounds, self.text_colors,
+        )
+
+        assert len(
+            self.bg_fg_pairings) > 0, "No good color matching found, try changing the background/foreground colors"
         self.seed = seed
         if seed is not None:
             random.seed(seed)
+
+    def __len__(self):
+        return 1000
 
     def __iter__(self):
         return iter((self[0],))
 
     def __getitem__(self, _):
-        background = random.choice(self.backgrounds)
+        background, text_color = random.choice(self.bg_fg_pairings)
         text = random.choice(self.texts)
         font = random.choice(self.fonts)
-        text_color = random.choice(self.text_colors)
-        return generate(background=background,
-                        text=text,
-                        font=font,
-                        text_color=text_color)
+        image = generate(background=background,
+                         text=text,
+                         font=font,
+                         text_color=text_color)
+        return image, text

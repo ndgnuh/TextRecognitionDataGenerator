@@ -27,4 +27,4 @@ class RandomSampler(Sampler):
         return 100
 
     def __iter__(self):
-        return iter((self[0], ))
+        return iter((self[i] for i in range(len(self))))
