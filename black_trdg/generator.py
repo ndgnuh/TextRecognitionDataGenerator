@@ -25,20 +25,9 @@ def generate(
     - Resize to desired size
     - Returns both image and text
     """
-    # Calculate and get the cropped background
-    bg_width, bg_height = background.size
+    # Estimate the text bounding box
     x1, y1, x2, y2 = font.getbbox(text, stroke_width=stroke_width)
     crop_width, crop_height = x2 - x1, y2 - x1
-    if bg_width <= crop_width or bg_height <= crop_height:
-        background = background.resize((crop_width, crop_height))
-    else:
-        crop_x1 = randint(0, bg_width - crop_width - 1)
-        crop_y1 = randint(0, bg_height - crop_height - 1)
-        crop_box = (crop_x1,
-                    crop_y1,
-                    crop_x1 + crop_width,
-                    crop_y1 + crop_height)
-        background = background.crop(crop_box)
 
     # Create the empty text box
     text_mask = Image.new("RGBA", (crop_width, crop_height), (0, 0, 0, 0))
@@ -49,6 +38,20 @@ def generate(
     # Apply transformation(s) if any
     if transform is not None:
         text_mask = transform(text_mask)
+
+    # Get the real crop size and get the cropped background
+    crop_width, crop_height = text_mask.size
+    bg_width, bg_height = background.size
+    if bg_width <= crop_width or bg_height <= crop_height:
+        background = background.resize((crop_width, crop_height))
+    else:
+        crop_x1 = randint(0, bg_width - crop_width - 1)
+        crop_y1 = randint(0, bg_height - crop_height - 1)
+        crop_box = (crop_x1,
+                    crop_y1,
+                    crop_x1 + crop_width,
+                    crop_y1 + crop_height)
+        background = background.crop(crop_box)
     if background_transform is not None:
         background = background_transform(background)
 
@@ -85,6 +88,8 @@ class Generator(tuple):
                  backgrounds,
                  fonts,
                  text_colors=[(0, 0, 0)],
+                 transform=None,
+                 background_transform=None,
                  count=None,
                  seed=None):
         self.texts = prepare_assets(texts, load_textfile)
@@ -99,6 +104,8 @@ class Generator(tuple):
         self.bg_fg_pairings = get_bg_fg_pairings(
             self.backgrounds, self.text_colors,
         )
+        self.background_transform = background_transform
+        self.transform = transform
 
         assert len(
             self.bg_fg_pairings) > 0, "No good color matching found, try changing the background/foreground colors"
@@ -119,5 +126,7 @@ class Generator(tuple):
         image = generate(background=background,
                          text=text,
                          font=font,
-                         text_color=text_color)
+                         text_color=text_color,
+                         transform=self.transform,
+                         background_transform=self.background_transform)
         return image, text
