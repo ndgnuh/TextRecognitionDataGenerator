@@ -7,6 +7,7 @@ from os import path, listdir
 from itertools import cycle
 
 
+from .utils import find
 from .samplers_base import RandomSampler, Sampler
 
 
@@ -47,7 +48,7 @@ class DefaultBackgroundSampler(RandomSampler):
 
     def __getitem__(self, _):
         color = random.choice(self.color_sampler)
-        return Image.new("RGB", (512, 512), color)
+        return Image.new("RGB", (1024, 1024), color)
 
 
 class DefaultFontSampler(RandomSampler):
@@ -131,3 +132,9 @@ class BackgroundDirectory(Sampler):
 
     def __getitem__(self, i):
         return self.backgrounds[i]
+
+
+def TextDirectory(root_dir, suffix, encoding="utf-8", delim="\n"):
+    files = find(root_dir, name=suffix, type="f")
+    samplers = [TextFile(file, encoding, delim) for file in files]
+    return CombineSampler(samplers)
