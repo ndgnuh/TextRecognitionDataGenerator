@@ -20,10 +20,33 @@ def box_blur(image, radius):
     return image.filter(kernel)
 
 
+def padding(image, x1, y1, x2, y2):
+    np_image = np.array(image)
+    np_image = np.pad(np_image, [(y1, y2), (x1, x2), (0, 0)], 'constant')
+    image = Image.fromarray(np_image)
+    return image
+
+
+@dataclass
+class RandomPadding:
+    def __init__(self, x1, y1=None, x2=None, y2=None):
+        self.x1 = x1
+        self.y1 = y1 if y1 is not None else x1
+        self.y2 = y2 if y2 is not None else x1
+        self.x2 = x2 if x2 is not None else x1
+
+    def __call__(self, image):
+        x1 = random.randint(*self.x1)
+        x2 = random.randint(*self.x2)
+        y1 = random.randint(*self.y1)
+        y2 = random.randint(*self.y2)
+        return padding(image, x1, y1, x2, y2)
+
+
 @dataclass
 class RandomGaussianBlur:
     min_radius: float = 1
-    max_radius: float = 3
+    max_radius: float = 2
 
     def __call__(self, image):
         radius = random.choice(
@@ -34,7 +57,7 @@ class RandomGaussianBlur:
 @dataclass
 class RandomBoxBlur:
     min_radius: float = 1
-    max_radius: float = 3
+    max_radius: float = 2
 
     def __call__(self, image):
         radius = random.choice(
