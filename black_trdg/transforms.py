@@ -15,7 +15,7 @@ def gaussian_blur(image, radius):
     return image.filter(kernel)
 
 
-def box_blur(image, radius, Filter):
+def box_blur(image, radius):
     kernel = ImageFilter.BoxBlur(radius=radius)
     return image.filter(kernel)
 
@@ -26,9 +26,9 @@ class RandomGaussianBlur:
     max_radius: float = 3
 
     def __call__(self, image):
-        radius = random.random(
+        radius = random.choice(
             np.arange(self.min_radius, self.max_radius, 0.01))
-        return gaussian_blur(radius, radius)
+        return gaussian_blur(image, radius)
 
 
 @dataclass
@@ -37,9 +37,9 @@ class RandomBoxBlur:
     max_radius: float = 3
 
     def __call__(self, image):
-        radius = random.random(
+        radius = random.choice(
             np.arange(self.min_radius, self.max_radius, 0.01))
-        return box_blur(radius, radius)
+        return box_blur(image, radius)
 
 
 @dataclass
