@@ -1,9 +1,10 @@
 from PIL import Image, ImageFilter
-from typing import Callable, List
+from typing import Callable, List, Tuple
 from PIL.Image import Resampling
 from dataclasses import dataclass
 import numpy as np
 import random
+import cv2
 
 
 def rotate(image, degree):
@@ -20,11 +21,37 @@ def box_blur(image, radius):
     return image.filter(kernel)
 
 
+def motion_blur(image, size, vertical=True):
+    kernel_motion_blur = np.zeros((size, size))
+    if vertical:
+        kernel_motion_blur[int((size-1)/2), :] = np.ones(size)
+    else:
+        kernel_motion_blur[:, int((size-1)/2)] = np.ones(size)
+    kernel_motion_blur = kernel_motion_blur / size
+    image = np.array(image)
+    result = cv2.filter2D(image, -1, kernel_motion_blur)
+    result = Image.fromarray(image)
+    return result
+
+
 def padding(image, x1, y1, x2, y2):
     np_image = np.array(image)
     np_image = np.pad(np_image, [(y1, y2), (x1, x2), (0, 0)], 'constant')
     image = Image.fromarray(np_image)
     return image
+
+
+@dataclass
+class RandomMotionBlur:
+    sizes: Tuple[int] = (1, 3, 5, 7)
+
+    def __call__(self, image):
+        size = random.choice(self.sizes)
+        if random.choice([True, False]):
+            image = motion_blur(image, size, vertical=True)
+        if random.choice([True, False]):
+            image = motion_blur(image, size, vertical=False)
+        return image
 
 
 @dataclass
@@ -122,3 +149,12 @@ class RandomApply:
             if random.random() < p:
                 image = t(image)
         return image
+
+
+@dataclass
+class OneOf:
+    transformations: List
+
+    def __call__(self, image):
+        transform = random.choice(self.transformations)
+        return transform(image)
