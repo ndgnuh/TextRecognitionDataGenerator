@@ -1,4 +1,4 @@
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageChops
 from typing import Callable, List, Tuple
 from PIL.Image import Resampling
 from dataclasses import dataclass
@@ -24,13 +24,15 @@ def box_blur(image, radius):
 def motion_blur(image, size, vertical=True):
     kernel_motion_blur = np.zeros((size, size))
     if vertical:
-        kernel_motion_blur[int((size-1)/2), :] = np.ones(size)
-    else:
         kernel_motion_blur[:, int((size-1)/2)] = np.ones(size)
+    else:
+        kernel_motion_blur[int((size-1)/2), :] = np.ones(size)
     kernel_motion_blur = kernel_motion_blur / size
-    image = np.array(image)
-    result = cv2.filter2D(image, -1, kernel_motion_blur)
-    result = Image.fromarray(image)
+    kernel = ImageFilter.Kernel(
+        (size, size),
+        kernel_motion_blur.flatten().tolist()
+    )
+    result = image.filter(kernel)
     return result
 
 
@@ -43,14 +45,16 @@ def padding(image, x1, y1, x2, y2):
 
 @dataclass
 class RandomMotionBlur:
-    sizes: Tuple[int] = (1, 3, 5, 7)
+    sizes: Tuple[int] = (3, 5)
+    n_applies: Tuple[int] = (1, 2, 3)
 
     def __call__(self, image):
         size = random.choice(self.sizes)
-        if random.choice([True, False]):
-            image = motion_blur(image, size, vertical=True)
-        if random.choice([True, False]):
-            image = motion_blur(image, size, vertical=False)
+        for i in range(random.choice(self.n_applies)):
+            if random.choice([True, False]):
+                image = motion_blur(image, size, vertical=True)
+            if random.choice([True, False]):
+                image = motion_blur(image, size, vertical=False)
         return image
 
 
@@ -104,13 +108,15 @@ class RandomRotate:
         return rotate(image, degree)
 
 
+@dataclass
 class GaussianNoise:
+    sigma: Tuple[int, int] = (1, 10)
+
     def __call__(self, image):
-        image = np.array(image, dtype='uint8') / 255
-        noise = np.random.randn(*image.shape) / 10
-        image = np.clip(image + noise, 0, 1)
-        image = (image * 255).round().astype('uint8')
-        image = Image.fromarray(image)
+        sigma = random.randint(*self.sigma)
+        level = 1 - random.choice(np.arange(0.1, 0.3, 0.01).tolist())
+        noise = Image.effect_noise(image.size, sigma).convert("RGB")
+        image = ImageChops.blend(image.convert("RGB"), noise, level)
         return image
 
 
