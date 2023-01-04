@@ -67,7 +67,7 @@ class CombineSampler(Sampler):
         self.n_samplers = len(samplers)
 
     def __len__(self):
-        return max(self.lens) * (self.lens)
+        return max(self.lens) * self.n_samplers
 
     def __getitem__(self, idx):
         sampler_idx = idx % self.n_samplers
