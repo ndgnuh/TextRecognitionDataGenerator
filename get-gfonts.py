@@ -6,6 +6,7 @@ parser.add_argument("--lang")
 parser.add_argument("--display", action="store_true", default=False)
 parser.add_argument("--handwriting", action="store_true", default=False)
 parser.add_argument("--monospace", action="store_true", default=False)
+parser.add_argument("--all-variant", action="store_true", default=False)
 
 args = parser.parse_args()
 with open("./webfonts.json", encoding="utf-8") as f:
@@ -24,12 +25,20 @@ if not args.handwriting:
 if not args.monospace:
     data = [font for font in data
             if font['category'] != 'monospace']
+if not args.all_variant:
+    for font in data:
+        font['files'] = {name: url
+                         for name, url in font['files'].items()
+                         if name == 'regular' or name == '500'}
+        if 'regular' in font['files'] and '500' in font['files']:
+            font['files'].pop('500')
+
 
 fonts = []
 for font in data:
-    family = font['family']
+    family = font['family'].replace(" ", "_")
     for name, url in font['files'].items():
         _, ext = path.splitext(url)
-        fonts.append(f"{family}{name}{ext}\t{url}")
+        fonts.append(f"{family}_{name}{ext}\t{url}")
 
 print("\n".join(fonts))
