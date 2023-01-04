@@ -41,9 +41,10 @@ class RandomColorSampler(RandomSampler):
 
 
 class DefaultBackgroundSampler(RandomSampler):
-    def __init__(self):
+    def __init__(self, max=(90, 90, 90), min=(0, 0, 0)):
         self.color_sampler = RandomColorSampler(
-            max=(90, 90, 90)
+            max=max,
+            min=min
         )
 
     def __getitem__(self, _):
@@ -66,7 +67,7 @@ class CombineSampler(Sampler):
         self.n_samplers = len(samplers)
 
     def __len__(self):
-        return sum(self.lens)
+        return max(self.lens) * (self.lens)
 
     def __getitem__(self, idx):
         sampler_idx = idx % self.n_samplers
