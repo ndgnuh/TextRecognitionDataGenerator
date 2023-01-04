@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageFilter
 from typing import Callable, List
 from PIL.Image import Resampling
 from dataclasses import dataclass
@@ -8,6 +8,21 @@ import random
 
 def rotate(image, degree):
     return image.rotate(degree, expand=True, resample=Resampling.BILINEAR)
+
+
+def gaussian_blur(image, radius):
+    kernel = ImageFilter.GaussianBlur(radius=radius)
+    return image.filter(kernel)
+
+
+@dataclass
+class RandomGaussianBlur:
+    min_radius: float = 1
+    max_radius: float = 3
+
+    def __call__(self, image):
+        radius = random.random(np.arange(min_radius, max_radius, 0.01))
+        return gaussian_blur(radius, radius)
 
 
 @dataclass
