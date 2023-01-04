@@ -26,7 +26,8 @@ class RandomGaussianBlur:
     max_radius: float = 3
 
     def __call__(self, image):
-        radius = random.random(np.arange(min_radius, max_radius, 0.01))
+        radius = random.random(
+            np.arange(self.min_radius, self.max_radius, 0.01))
         return gaussian_blur(radius, radius)
 
 
@@ -36,7 +37,8 @@ class RandomBoxBlur:
     max_radius: float = 3
 
     def __call__(self, image):
-        radius = random.random(np.arange(min_radius, max_radius, 0.01))
+        radius = random.random(
+            np.arange(self.min_radius, self.max_radius, 0.01))
         return box_blur(radius, radius)
 
 
