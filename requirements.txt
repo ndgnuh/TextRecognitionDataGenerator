@@ -1,0 +1,7 @@
+Pillow
+numpy
+opencv-python
+tqdm
+questionary
+gdown
+lenses
