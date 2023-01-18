@@ -1,3 +1,6 @@
+min_length: 5
+max_length: 10
+
 texts:
   vocabs:
     - resources/vocabs/digits.txt
@@ -5,11 +8,18 @@ texts:
   dictionaries:
     - resources/dicts/websites.txt
 
+text_colors:
+  colors:
+    - "#ffffff"
+    - "#000000"
+  palettes:
+    - "#000000:#ffffff"
+
 fonts: resources/fonts/
 
 backgrounds:
   colors:
-    - #FFFFFF
-    - #000000
+    - "#FFFFFF"
+    - "#000000"
   images:
     - resources/backgrounds
