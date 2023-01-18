@@ -139,3 +139,28 @@ def TextDirectory(root_dir, suffix, encoding="utf-8", delim="\n"):
     files = find(root_dir, name=suffix, type="f")
     samplers = [TextFile(file, encoding, delim) for file in files]
     return CombineSampler(samplers)
+
+
+class VocabFileSampler(Sampler):
+    def __init__(self, vocab_file, length):
+        with open(vocab_file) as f:
+            vocabs = f.read().strip()
+            if " " not in vocabs:
+                vocabs = vocabs + " "
+            self.vocabs = vocabs
+
+        if isinstance(length, int):
+            self.min_length = length
+            self.max_length = length
+        else:
+            self.min_length = min(length)
+            self.max_length = max(length)
+
+    def __len__(self):
+        return 100_000
+
+    def __getitem__(self, idx):
+        k = random.randint(self.min_length, self.max_length)
+        list_text = random.choices(self.vocabs, k=k)
+        text = ''.join(list_text)
+        return text
