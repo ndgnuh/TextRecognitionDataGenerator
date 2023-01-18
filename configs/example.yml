@@ -1,0 +1,15 @@
+texts:
+  vocabs:
+    - resources/vocabs/digits.txt
+    - resources/vocabs/specials.txt
+  dictionaries:
+    - resources/dicts/websites.txt
+
+fonts: resources/fonts/
+
+backgrounds:
+  colors:
+    - #FFFFFF
+    - #000000
+  images:
+    - resources/backgrounds
