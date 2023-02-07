@@ -3,6 +3,7 @@ max_length: 10
 
 texts:
   vocabs:
+    - resources/vocabs/vi.txt
     - resources/vocabs/digits.txt
     - resources/vocabs/specials.txt
   dictionaries:
