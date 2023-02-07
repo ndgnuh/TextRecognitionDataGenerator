@@ -103,10 +103,13 @@ class FontFile(Sampler):
 
 class FontDirectory(Sampler):
     def __init__(self, fontdir, size=36):
-        self.fonts = [
-            ImageFont.truetype(path.join(fontdir, file), size=36)
-            for file in listdir(fontdir)
-        ]
+        self.fonts = []
+        for file in listdir(fontdir):
+            try:
+                font = ImageFont.truetype(path.join(fontdir, file), size=36)
+                self.fonts.append(font)
+            except Exception:
+                print(f"Can't load {file}")
 
     def __iter__(self):
         return iter(self.fonts)
@@ -120,10 +123,15 @@ class FontDirectory(Sampler):
 
 class BackgroundDirectory(Sampler):
     def __init__(self, bgdir, max_size=None):
-        self.backgrounds = [
-            Image.open(path.join(bgdir, file))
-            for file in listdir(bgdir)
-        ]
+
+        self.backgrounds = []
+        for file in listdir(bgdir):
+            try:
+                bg = Image.open(path.join(bgdir, file))
+                self.backgrounds.append(bg)
+            except Exception:
+                print(f"Can't load {file}")
+
         if max_size is not None:
             for bg in self.backgrounds:
                 bg.thumbnail(max_size)

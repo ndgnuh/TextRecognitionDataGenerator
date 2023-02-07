@@ -16,11 +16,13 @@ text_colors:
   palettes:
     - "#000000:#ffffff"
 
-fonts: resources/fonts/
+fonts: resources/fonts/vietnamese/
 
 backgrounds:
   colors:
-    - "#FFFFFF"
-    - "#000000"
+    - from: [0, 0, 0]
+      to: [50, 50, 50]
+    - from: [200, 200, 200]
+      to: [255, 255, 255]
   images:
     - resources/backgrounds
