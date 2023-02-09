@@ -20,7 +20,7 @@ def main():
     parser = ArgumentParser()
     parser.add_argument("config", help="Path to config file")
     parser.add_argument("output", help="Path to output directory")
-    parser.add_argument("--count", "-n", dest="count",
+    parser.add_argument("--count", "-n", dest="count", type=int,
                         help="Number of samples")
     args = parser.parse_args()
 
