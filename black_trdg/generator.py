@@ -124,6 +124,8 @@ class Generator(tuple):
         background, text_color = random.choice(self.bg_fg_pairings)
         text = random.choice(self.texts)
         font = random.choice(self.fonts)
+        if random.choice([True, False]):
+            text = text.upper()
         image = generate(background=background,
                          text=text,
                          font=font,
