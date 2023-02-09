@@ -20,6 +20,8 @@ def main():
     parser = ArgumentParser()
     parser.add_argument("config", help="Path to config file")
     parser.add_argument("output", help="Path to output directory")
+    parser.add_argument("--count", "-n", dest="count",
+                        help="Number of samples")
     args = parser.parse_args()
 
     config = read_config(args.config)
@@ -37,6 +39,9 @@ def main():
         sampler = S.TextFile(f)
         samplers.append(sampler)
     del sampler
+    for f in config['texts'].get('directories', []):
+        sampler = S.TextDirectory(f, suffix=".txt")
+        samplers.append(sampler)
     texts = S.CombineSampler(samplers)
 
     # Background samplers
@@ -55,7 +60,10 @@ def main():
     # Other samplers
     # TODO
     text_colors = S.DefaultColorSampler()
-    transform = transforms.RandomRotate(-1, 1)
+    transform = transforms.RandomApply([
+        transforms.RandomRotate(-3, 3),
+        transforms.RandomPadding((-5, 20))
+    ])
     background_transform = transforms.RandomApply([
         transforms.GaussianNoise()
     ])
@@ -67,6 +75,7 @@ def main():
         text_colors=text_colors,
         transform=transform,
         background_transform=background_transform,
+        count=args.count,
     )
 
     # Generate data
@@ -81,8 +90,9 @@ def main():
         out_path = path.join(output_path, name)
         try:
             image.save(out_path)
-            annotations.append(f"{out_path}\t{text}")
+            annotations.append(f"{image_dir}/{name}\t{text}")
         except ValueError:
+            ic(text)
             print_exc()
 
     with open(path.join(output_path, "annotations.txt"), "w") as f:
