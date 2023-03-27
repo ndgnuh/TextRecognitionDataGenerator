@@ -1,28 +1,39 @@
-min_length: 5
-max_length: 10
+output: outputs/vi-bootstrap
+count: r
 
 texts:
-  vocabs:
-    - resources/vocabs/vi.txt
-    - resources/vocabs/digits.txt
-    - resources/vocabs/specials.txt
-  dictionaries:
-    - resources/dicts/websites.txt
+  - name: VocabRep
+    vocab_file: resources/vocabs/vi.txt
+    max_length: 50
+  - name: VocabRep
+    vocab_file: resources/vocabs/latin.txt
+    max_length: 50
+  - name: VocabRep
+    vocab_file: resources/vocabs/specials.txt
+    max_length: 50
+  - name: VocabRep
+    vocab_file: resources/vocabs/digits.txt
+    max_length: 50
 
-text_colors:
-  colors:
-    - "#ffffff"
-    - "#000000"
-  palettes:
-    - "#000000:#ffffff"
+fonts:
+  - name: FontDir
+    path: resources/fonts/vietnamese/
 
-fonts: resources/fonts/vietnamese/
+foregrounds:
+  - name: Color
+    a: [0, 0, 0]
+    b: [255, 255, 255]
+    image: false
+    count: 500
 
 backgrounds:
-  colors:
-    - from: [0, 0, 0]
-      to: [50, 50, 50]
-    - from: [200, 200, 200]
-      to: [255, 255, 255]
-  images:
-    - resources/backgrounds
+  - name: Color
+    a: [0, 0, 0]
+    b: [50, 50, 50]
+    count: 20
+  - name: Color
+    a: [200, 200, 200]
+    b: [255, 255, 255]
+    count: 20
+  - name: ImageDir
+    path: resources/backgrounds/
