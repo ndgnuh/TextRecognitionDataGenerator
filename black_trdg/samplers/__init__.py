@@ -1,4 +1,4 @@
-from .texts import VocabRep, VocabRand
+from .texts import VocabRep, VocabRand, TextFile, LongTextFile
 from .bg import Color, ImageDir
 from .other import FontDir, FontFile
 
