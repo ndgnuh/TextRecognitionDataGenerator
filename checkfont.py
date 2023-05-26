@@ -7,6 +7,7 @@ import os
 
 parser = ArgumentParser()
 parser.add_argument("--vocab", "-c", required=True)
+parser.add_argument("-r", help="Output font file only", default=False, dest="raw_output", action="store_true")
 parser.add_argument("font")
 args = parser.parse_args()
 
@@ -33,4 +34,7 @@ for font_file in args.font:
         if not has_glyph(font, c):
             missings.append(c)
     if len(missings) > 0:
-        print("Missing %s in %s" % (font_file, missings))
+        if args.raw_output:
+            print(font_file)
+        else:
+            print("Missing %s in %s" % (missings, font_file))
