@@ -33,4 +33,4 @@ for font_file in args.font:
         if not has_glyph(font, c):
             missings.append(c)
     if len(missings) > 0:
-        print(font_file, missings)
+        print("Missing %s in %s" % (font_file, missings))
